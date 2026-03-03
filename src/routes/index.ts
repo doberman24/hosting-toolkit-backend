@@ -1,10 +1,11 @@
 import type { Router as RouterType } from "express";
+import { ICheckDomain } from "../types/server.types";
 const { Router } = require('express');
 const CheckDomain = require('./checkDomain.routes');
 
 module.exports = class Routes {
-    public router: RouterType;
-    public checkDomain: typeof CheckDomain;
+    private router: RouterType;
+    private checkDomain: ICheckDomain;
      
     constructor() {
         this.router = Router()

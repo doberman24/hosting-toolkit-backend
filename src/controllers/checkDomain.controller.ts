@@ -1,8 +1,12 @@
 import { Request, Response } from 'express';
+import { ICheckDomainController, ICheckDomainService } from '../types/server.types';
+const CheckDomainService = require('../services/checkDomainService')
 
-module.exports = class CheckDomainController {
+module.exports = class CheckDomainController implements ICheckDomainController {
+    private checkDomainService: ICheckDomainService;
+
     constructor() {
-        // this.authService = new AuthService();
+        this.checkDomainService = new CheckDomainService();
     };
 
     async checkDomainResolve(req: Request, res: Response): Promise<void> {
@@ -11,7 +15,8 @@ module.exports = class CheckDomainController {
             res.status(401).json({error: 'Заполните все поля'});
             return;
         }
-        res.status(200).json({success: domain});
+        const result: string = this.checkDomainService.checkDomainData(domain);
+        res.status(200).json({success: result});
         return;
     };
 }
