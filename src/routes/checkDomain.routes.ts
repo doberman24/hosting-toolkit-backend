@@ -1,7 +1,13 @@
+import { Router } from "express";
+
+// const { Router } = require('express');
 const CheckDomainController = require('../controllers/checkDomain.controller');
 
 module.exports = class CheckDomain {
-  constructor(router) {
+  public router: Router;
+  checkDomainController: typeof CheckDomainController;
+
+  constructor(router: Router) {
     this.router = router;
     this.checkDomainController = new CheckDomainController();
   }
