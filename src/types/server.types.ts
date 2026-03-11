@@ -1,4 +1,5 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
+import { dnsDataType } from './worker.type';
 
 export type CorsType = {
     origin: string,
@@ -14,9 +15,9 @@ export interface ICheckDomain {
 }
 
 export interface ICheckDomainController {
-    checkDomainResolve(req: Request, res: Response): Promise<void>;
+    checkDomainResolve(req: Request, res: Response, next: NextFunction): Promise<void>;
 }
 
 export interface ICheckDomainService {
-    checkDomainData(domain: string): string
+    checkDomainData(domain: string, next: NextFunction): Promise<dnsDataType>;
 }

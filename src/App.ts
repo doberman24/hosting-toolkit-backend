@@ -36,8 +36,8 @@ module.exports = class App implements IApp {
     //обработка ошибок при http-запросе,и возврат ее клиенту
     initErrorHandling(): void {
         this.server.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-            console.error(err.stack);
-            res.status(500).json({message: 'Internal Server Error'});
+            console.error(err);
+            res.json({message: err});
         });
     };
 
