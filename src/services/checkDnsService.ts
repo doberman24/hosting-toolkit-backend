@@ -1,17 +1,16 @@
-import { NextFunction } from "express";
-import { ICheckDomainService } from "../types/server.types";
+import { ICheckDnsService } from "../types/server.types";
 import type { Resolver as ResolverType } from 'dns/promises';
-import {dnsDataType, nameserversType, nsCneckType, RecordsType, Statuses } from "../types/worker.type";
+import {dnsDataType, nameserversType, nsCneckType, RecordsType, Statuses } from "../types/dns.type";
 const { Resolver } = require('dns/promises');
 
-module.exports = class CheckDomainService implements ICheckDomainService {
+module.exports = class CheckDnsService implements ICheckDnsService {
     private resolver: ResolverType;
     constructor () {
         this.resolver = new Resolver();
         this.resolver.setServers(['1.1.1.1', '8.8.8.8']);
     }
 
-    async checkDomainData(domain: string, next: NextFunction): Promise<dnsDataType> {
+    async checkDNSData(domain: string): Promise<dnsDataType> {
 
         try {
             const dnsCollection: RecordsType[] = await Promise.allSettled([
@@ -33,7 +32,7 @@ module.exports = class CheckDomainService implements ICheckDomainService {
         }
     };
 
-    async getARecords (resolver: ResolverType, domain: string, type: 'a' | 'aaaa'): Promise<{aRecods?: RecordsType, aaaaRecords?: RecordsType}> {
+    private async getARecords (resolver: ResolverType, domain: string, type: 'a' | 'aaaa'): Promise<{aRecods?: RecordsType, aaaaRecords?: RecordsType}> {
         try {
             let minTtl = 0;
             const resultA = await (type === 'aaaa'
@@ -56,7 +55,7 @@ module.exports = class CheckDomainService implements ICheckDomainService {
         }
     };
 
-    async getNSRecords (resolver: ResolverType, domain: string) {
+    private async getNSRecords (resolver: ResolverType, domain: string) {
         try {
             const nsList: string[] = await resolver.resolveNs(domain);
             // const nsListFake = ['ns1.example.com', 'ns1.beget.pro', 'ns2.beget.com', 'dns.google', 'ns1.beget.com'];
@@ -89,7 +88,7 @@ module.exports = class CheckDomainService implements ICheckDomainService {
         }
     };
 
-    buildData(unformatedData: RecordsType[]) {
+    private buildData(unformatedData: RecordsType[]) {
         const dnsData: dnsDataType = {} as dnsDataType;
         unformatedData.forEach(item => {
             Object.assign(dnsData, item);
@@ -98,7 +97,7 @@ module.exports = class CheckDomainService implements ICheckDomainService {
         if (!dnsData.aRecords.ttl) {
             dnsData.ttl = {data: null, status: 'empty'};
         } else {
-            dnsData.ttl = {data: dnsData.aRecords.ttl, status: dnsData.aRecords.ttl > 60 && dnsData.aRecords.ttl < 86400 ? 'ok' : 'warning_status'} 
+            dnsData.ttl = {data: dnsData.aRecords.ttl, status: dnsData.aRecords.ttl >= 60 && dnsData.aRecords.ttl <= 86400 ? 'ok' : 'warning_status'} 
         }
 
         const {ttl, ...aRecords} = dnsData.aRecords;
@@ -109,7 +108,7 @@ module.exports = class CheckDomainService implements ICheckDomainService {
     }
 
 
-    getValidStatusDNS(dnsData: dnsDataType) {
+    private getValidStatusDNS(dnsData: dnsDataType) {
         const {status, ttl, ...clearStatuses} = dnsData;
         const statuses: Statuses = Object.entries(clearStatuses).reduce((acc, [key, value]) => {
             acc[key as keyof Statuses] = value.status;
@@ -146,7 +145,7 @@ module.exports = class CheckDomainService implements ICheckDomainService {
         return dnsData;
     }
 
-    nsParsing (nsList: nsCneckType[]) {
+    private nsParsing (nsList: nsCneckType[]) {
         const result: {data: (string | nsCneckType)[], status: string} = {data: [], status: 'ok'};
         result.data = nsList.reduce((acc: (string | nsCneckType)[], item) => {
             const value = Object.values(item)[0] as string;
@@ -171,7 +170,7 @@ module.exports = class CheckDomainService implements ICheckDomainService {
         return result;
     }
 
-    checkNSRecords(nsRecords: nameserversType[]): nsCneckType[] {
+    private checkNSRecords(nsRecords: nameserversType[]): nsCneckType[] {
 
         let soaRefer: number | null = null;
         let setNsResolveMain: Set<string> = new Set();

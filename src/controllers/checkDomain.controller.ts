@@ -1,12 +1,12 @@
 import { NextFunction, Request, Response } from 'express';
-import { ICheckDomainController, ICheckDomainService } from '../types/server.types';
-const CheckDomainService = require('../services/checkDomainService')
+import { ICheckDomainController, IDomainResultService } from '../types/server.types';
+const DomainResultService = require('../services/domainResultService')
 
 module.exports = class CheckDomainController implements ICheckDomainController {
-    private checkDomainService: ICheckDomainService;
+    private domainResultService: IDomainResultService;
 
     constructor() {
-        this.checkDomainService = new CheckDomainService();
+        this.domainResultService = new DomainResultService();
     };
 
     async checkDomainResolve(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -16,7 +16,7 @@ module.exports = class CheckDomainController implements ICheckDomainController {
             return;
         }
         try {
-            const result = await this.checkDomainService.checkDomainData(domain, next);
+            const result = await this.domainResultService.getMainResult(domain);
             res.status(200).json(result);
             return;
         } catch(error) {

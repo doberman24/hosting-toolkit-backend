@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
-import { dnsDataType } from './worker.type';
+import { dnsDataType, nameserversType, RecordsType } from './dns.type';
+import type { Resolver as ResolverType } from 'dns/promises';
 
 export type CorsType = {
     origin: string,
@@ -18,6 +19,14 @@ export interface ICheckDomainController {
     checkDomainResolve(req: Request, res: Response, next: NextFunction): Promise<void>;
 }
 
-export interface ICheckDomainService {
-    checkDomainData(domain: string, next: NextFunction): Promise<dnsDataType>;
+export interface ICheckDnsService {
+    checkDNSData(domain: string): Promise<dnsDataType>, 
+}
+
+export interface IDomainResultService {
+    getMainResult(domain: string): Promise<unknown>
+}
+
+export interface ICheckSslServise {
+    checkSSLData(domain: string): Promise<unknown>
 }
