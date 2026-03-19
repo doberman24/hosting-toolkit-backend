@@ -25,12 +25,12 @@ module.exports =  class DomainResultService implements IDomainResultService {
             }));
             return {
                 domain: domain,
-                // checkedAt: new Date(),
-                // summary: {
-                //     status: 'warning',
-                //     score: 82,
-                //     message: 'Сертификат SSL действителен. DNS настроен корректно. Обнаружены задержки ответа сервера (750мс), что может влиять на производительность.' 
-                // },
+                checkedAt: new Date(),
+                summary: {
+                    status: 'warning',
+                    score: 82,
+                    message: 'Сертификат SSL действителен. DNS настроен корректно. Обнаружены задержки ответа сервера (750мс), что может влиять на производительность.' 
+                },
                 checks: {
                     dns: result[0],
                     ssl: result[1]

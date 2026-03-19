@@ -1,5 +1,6 @@
 import { DetailedPeerCertificate } from "node:tls";
 import { errorSSLtype, getSSLType, SslDataType, SslType } from "../types/ssl.types";
+import { errorStatusData } from "../utilites/ssl.utilites";
 const tls = require('tls');
 
 module.exports = class CheckSslService {
@@ -38,25 +39,9 @@ module.exports = class CheckSslService {
     async checkSSLData(domain: string): Promise<unknown> {
         try {
             const sslData: getSSLType = await this.tlsConnect(domain);
-            console.log('\n############################');
-            const result = this.buildSslData(sslData)
-            // console.log(result);
-            return result;
+            return this.buildSslData(sslData);
         } catch (error: any) {
-            throw(this.errorStatusData(error.code));
-        }
-    }
-
-    errorStatusData(error: string) {
-        console.log(error);
-        return {
-            status: 'error',
-            certificate: {data: null, status: 'undefined'},
-            issuer: {data: null, status: 'undefined'},
-            validFrom: {data: null, status: 'undefined'},
-            validTo: {data: null, status: 'undefined'},
-            daysRemaining: {data: null, status: 'undefined'},
-            protocol: {data: null, status: 'undefined'},
+            throw(errorStatusData(error.code));
         }
     }
 
@@ -76,7 +61,6 @@ module.exports = class CheckSslService {
     }
 
     formatSslIssuer(data: string | string[] | undefined, auth: boolean, authError: string) {
-        console.log(auth, authError);
         if (!data) return {data: null, status: 'empty'};
         const formatData = {data: data, status: 'ok'};
         if (!auth) {

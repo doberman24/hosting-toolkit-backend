@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { dnsDataType, nameserversType, RecordsType } from './dns.type';
-import type { Resolver as ResolverType } from 'dns/promises';
+import { dnsDataType } from './dns.type';
 
 export type CorsType = {
     origin: string,
