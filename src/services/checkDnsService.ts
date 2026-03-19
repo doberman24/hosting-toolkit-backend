@@ -44,7 +44,7 @@ module.exports = class CheckDnsService implements ICheckDnsService {
         if (!dnsData.aRecords.ttl) {
             dnsData.ttl = {data: null, status: 'empty'};
         } else {
-            dnsData.ttl = {data: dnsData.aRecords.ttl, status: dnsData.aRecords.ttl >= 60 && dnsData.aRecords.ttl <= 3000 ? 'ok' : 'warning_status'} 
+            dnsData.ttl = {data: dnsData.aRecords.ttl, status: dnsData.aRecords.ttl >= 60 && dnsData.aRecords.ttl <= 86400 ? 'ok' : 'warning_status'} 
         }
 
         const {ttl, ...aRecords} = dnsData.aRecords;
