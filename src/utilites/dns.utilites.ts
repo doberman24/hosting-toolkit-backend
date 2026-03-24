@@ -1,6 +1,6 @@
 import {dnsDataType, nameserversType, nsCneckType, RecordsType, Statuses } from "../types/dns.type";
 
-export const getValidStatusDNS = (dnsData: dnsDataType) => {
+exports.getValidStatusDNS = (dnsData: dnsDataType) => {
     const {status, ttl, ...clearStatuses} = dnsData;
     const statuses: Statuses = Object.entries(clearStatuses).reduce((acc, [key, value]) => {
         acc[key as keyof Statuses] = value.status;
@@ -40,7 +40,7 @@ export const getValidStatusDNS = (dnsData: dnsDataType) => {
     return dnsData;
 }
 
-export const nsParsing = (nsList: nsCneckType[]) => {
+exports.nsParsing = (nsList: nsCneckType[]) => {
     const result: {data: (string | nsCneckType)[], status: string} = {data: [], status: 'ok'};
     result.data = nsList.reduce((acc: (string | nsCneckType)[], item) => {
         const value = Object.values(item)[0] as string;
@@ -65,7 +65,7 @@ export const nsParsing = (nsList: nsCneckType[]) => {
     return result;
 }
 
-export const checkNSRecords = (nsRecords: nameserversType[]): nsCneckType[] => {
+exports.checkNSRecords = (nsRecords: nameserversType[]): nsCneckType[] => {
 
     let soaRefer: number | null = null;
     let setNsResolveMain: Set<string> = new Set();

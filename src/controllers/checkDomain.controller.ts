@@ -11,12 +11,18 @@ module.exports = class CheckDomainController implements ICheckDomainController {
 
     async checkDomainResolve(req: Request, res: Response, next: NextFunction): Promise<void> {
         const {domain} = req.query as {domain?: string};
+        const domainRegex = /^(?!-)[a-zа-яё0-9-]{1,63}(?<!-)(\.[a-zа-яё0-9-]{1,63})*\.?$/;
         if (!domain) {
-            res.status(401).json({error: 'Заполните все поля'});
+            res.status(400).json({error: 'Заполните все поля'});
+            return;
+        }
+        if (!domainRegex.test(domain)) {
+            res.status(400).json({error: 'Неверный формат домена'});
             return;
         }
         try {
-            const result = await this.domainResultService.getMainResult(domain);
+            const normalizedDomain = domain.toLowerCase().trim().replace(/^www\./, '');
+            const result = await this.domainResultService.getMainResult(normalizedDomain);
             res.status(200).json(result);
             return;
         } catch(error) {

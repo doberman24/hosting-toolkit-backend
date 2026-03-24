@@ -13,7 +13,6 @@ export type errorSSLtype = {
 
 export interface SslType {
       status?: string,
-      certificate: SslDataType<string | null>,
       issuer: SslDataType<string | string[] | null>,
       validFrom: SslDataType<string | null>,
       validTo: SslDataType<string | null>,

@@ -1,20 +1,24 @@
-import { ICheckDnsService, ICheckSslServise, IDomainResultService } from "../types/server.types";
+import { ICheckDnsService, ICheckHttpServise, ICheckSslServise, IDomainResultService } from "../types/server.types";
 const CheckDnsService = require('./checkDnsService');
 const CheckSslService = require('./checkSslService');
+const CheckHttpService = require('./checkHttpService');
 
 module.exports =  class DomainResultService implements IDomainResultService {
     private checkDnsService: ICheckDnsService;
     private checkSslService: ICheckSslServise;
+    private checkHttpService: ICheckHttpServise;
     constructor() {
         this.checkDnsService = new CheckDnsService();
         this.checkSslService = new CheckSslService();
+        this.checkHttpService = new CheckHttpService();
     }
 
     async getMainResult(domain: string): Promise<unknown> {
         try {
             const result = await Promise.allSettled([
                 this.checkDnsService.checkDNSData(domain),
-                this.checkSslService.checkSSLData(domain)
+                this.checkSslService.checkSSLData(domain),
+                this.checkHttpService.checkHTTPData(domain),
             ])
             .then(res => res.map(item => {
                 if (item.status === 'fulfilled') {
@@ -33,11 +37,13 @@ module.exports =  class DomainResultService implements IDomainResultService {
                 },
                 checks: {
                     dns: result[0],
-                    ssl: result[1]
+                    ssl: result[1],
+                    http: result[2],
                 } 
             }
         } catch (error) {
-            // throw(error);
+            console.log(error);
+            throw(error);
         }
     }
 }

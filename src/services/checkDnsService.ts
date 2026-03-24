@@ -1,7 +1,7 @@
 import { ICheckDnsService } from "../types/server.types";
 import type { Resolver as ResolverType } from 'dns/promises';
-import {dnsDataType, nameserversType, nsCneckType, RecordsType, Statuses } from "../types/dns.type";
-import {checkNSRecords, getValidStatusDNS, nsParsing } from "../utilites/dns.utilites";
+import {dnsDataType, RecordsType, } from "../types/dns.type";
+const { checkNSRecords, getValidStatusDNS, nsParsing } = require("../utilites/dns.utilites");
 const { Resolver } = require('dns/promises');
 
 module.exports = class CheckDnsService implements ICheckDnsService {

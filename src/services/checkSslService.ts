@@ -1,6 +1,6 @@
 import { DetailedPeerCertificate } from "node:tls";
-import { errorSSLtype, getSSLType, SslDataType, SslType } from "../types/ssl.types";
-import { errorStatusData } from "../utilites/ssl.utilites";
+import { getSSLType, SslType } from "../types/ssl.types";
+const errorStatusSSLData = require("../utilites/ssl.utilites");
 const tls = require('tls');
 
 module.exports = class CheckSslService {
@@ -36,12 +36,12 @@ module.exports = class CheckSslService {
         });
     }
 
-    async checkSSLData(domain: string): Promise<unknown> {
+    async checkSSLData(domain: string): Promise<SslType> {
         try {
             const sslData: getSSLType = await this.tlsConnect(domain);
             return this.buildSslData(sslData);
         } catch (error: any) {
-            throw(errorStatusData(error.code));
+            throw(errorStatusSSLData(error.code));
         }
     }
 

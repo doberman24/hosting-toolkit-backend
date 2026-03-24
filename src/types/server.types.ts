@@ -29,3 +29,7 @@ export interface IDomainResultService {
 export interface ICheckSslServise {
     checkSSLData(domain: string): Promise<unknown>
 }
+
+export interface ICheckHttpServise {
+    checkHTTPData(domain: string): unknown
+}

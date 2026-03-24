@@ -1,4 +1,6 @@
-export const errorStatusData = (error: string) => {
+import { SslType } from "../types/ssl.types";
+
+const errorStatusSSLData = (error: string): SslType => {
     console.log(error);
     return {
         status: 'error',
@@ -9,3 +11,5 @@ export const errorStatusData = (error: string) => {
         protocol: {data: null, status: 'undefined'},
     }
 }
+
+exports.module = { errorStatusSSLData };
