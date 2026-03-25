@@ -13,11 +13,15 @@ const errorStatusHTTPData = (error: string): httpType => {
   }  
 }
 
-const errorTooManyRedirects = (error: any, checkStatusCode: (code: number) => httpDataType<number | null>): httpType => {
+const errorTooManyRedirects = (
+  error: any, 
+  maxRedirect: number, 
+  checkStatusCode: (code: number) => httpDataType<number | null>
+): httpType => {
   return {
     status: 'error',
     statusCode: checkStatusCode(error.response.statusCode),
-    redirectUrls: {data: '> 10', status: 'too_many_redirects'},
+    redirectUrls: {data: `> ${maxRedirect}`, status: 'too_many_redirects'},
     responseTimeMs: {data: null, status: 'empty'},
     ttfbMs: {data: null, status: 'empty'},
     serverTimeMs: {data: null, status: 'empty'},

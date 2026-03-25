@@ -1,8 +1,14 @@
 import { httpDataType, httpResponseType, httpType } from "../types/http.types";
 const { default: got } = require('got');
 const { errorTooManyRedirects, errorStatusHTTPData } = require('../utilites/http.utilites')
+const { addStatus } = require('../utilites/utilites');
 
 module.exports = class CheckHttpService {
+    private maxRedirect: number;
+
+    constructor() {
+        this.maxRedirect = 30;
+    }
     
     async checkHTTPData(domain: string) {
         const start = Date.now();
@@ -10,7 +16,7 @@ module.exports = class CheckHttpService {
             const http: httpResponseType = await got(
                 `http://${domain}`, {
                     followRedirect: true,
-                    // maxRedirects: 50,
+                    maxRedirects: this.maxRedirect,
                     https: {
                         rejectUnauthorized: false
                     },
@@ -24,13 +30,12 @@ module.exports = class CheckHttpService {
                 }
             );
             const end = Date.now();
-            console.log('---------------------------');
             const httpResult = this.buildData(http, start, end, domain);
-            console.log(httpResult);
+            return httpResult;
             
         } catch (error: any) {
             if (error.code === 'ERR_TOO_MANY_REDIRECTS') {
-                return errorTooManyRedirects(error, this.checkStatusCode);
+                return errorTooManyRedirects(error, this.maxRedirect, this.checkStatusCode);
             }
             const end = Date.now();
             if (error.response) {
@@ -51,6 +56,7 @@ module.exports = class CheckHttpService {
         httpData.responseTimeMs = this.parsingTimings(end - start, 'responseTimeMs');
         httpData.ttfbMs = this.parsingTimings(http.timings.response - http.timings.start, 'ttfmbMs');
         httpData.serverTimeMs = this.parsingTimings(http.timings.response - http.timings.upload, 'serverTimeMs');
+        httpData.status = addStatus(httpData, ['not_response', 'undefined', 'error_4xx', 'error_5xx']);
 
         return httpData;
     }
