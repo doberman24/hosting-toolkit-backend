@@ -83,23 +83,30 @@ module.exports = class CheckDnsService implements ICheckDnsService {
             // const nsListFake = ['ns1.example.com', 'ns1.beget.pro', 'ns2.beget.com', 'dns.google', 'ns1.beget.com'];
 
             const paramListNS = await Promise.allSettled(nsList.map(async (record: string) => {
-                
-                const aRecNS = await resolver.resolve4(record);
-                const nsResolver: ResolverType = new Resolver();
-                nsResolver.setServers(aRecNS);
+                try {
+                    const aRecNS = await resolver.resolve4(record);
+                    const nsResolver: ResolverType = new Resolver();
+                    nsResolver.setServers(aRecNS);
 
-                const nsCheckResolve = await nsResolver.resolve4(domain);
-                const soa = await nsResolver.resolveSoa(domain);
+                    const nsCheckResolve = await nsResolver.resolve4(domain);
 
-                return {[record]: {nsResolveDomain: nsCheckResolve, soa: soa.serial, nsAList: aRecNS}};
+                    const soa = await nsResolver.resolveSoa(domain);
+
+                    return {[record]: {nsResolveDomain: nsCheckResolve, soa: soa.serial, nsAList: aRecNS}};
+                } catch (err: any) {
+                    throw {...err, nsRecord: record}
+                }
             }))
             .then(result => result.map((item) => {
                 if (item.status === 'fulfilled') {
                     return item.value;
                 } else {
-                    return {[item.reason.hostname]: {error: item.reason.code}};
+                    const nsRecord = item.reason.nsRecord || item.reason.hostname || 'unknown';
+                    return {[nsRecord]: {error: item.reason.code}};
                 }
             }));
+
+            console.log(paramListNS);
 
             const checkNSList = checkNSRecords(paramListNS);
             const parsingNSList = nsParsing(checkNSList);

@@ -46,7 +46,7 @@ exports.nsParsing = (nsList: nsCneckType[]) => {
         const value = Object.values(item)[0] as string;
         const key = Object.keys(item)[0] as string;
         if (value  === 'ok') {
-            acc.push(key);
+            acc.push(item);
             return acc;
         }
         if (Array.isArray(value)) {
@@ -61,7 +61,6 @@ exports.nsParsing = (nsList: nsCneckType[]) => {
 
     if (result.data.every(item => Object.values(item)[0] === 'not_resolve')) result.status = 'undefined';
     else if (result.data.length < 2) result.status = 'few_ns';
-
     return result;
 }
 
