@@ -1,6 +1,6 @@
 import { DetailedPeerCertificate } from "node:tls";
 import { getSSLType, SslType } from "../types/ssl.types";
-const errorStatusSSLData = require("../utilites/ssl.utilites");
+const { errorStatusSSLData } = require("../utilites/ssl.utilites");
 const tls = require('tls');
 
 module.exports = class CheckSslService {
@@ -54,7 +54,8 @@ module.exports = class CheckSslService {
         ssl.protocol = this.getProtocol(protocol);
         
         if (Object.values(ssl).some(item => item.status !== 'ok')) {
-            ssl.status = Object.values(ssl).every(item => item.status === 'undefined') ? 'error' : 'warning';
+            const error = Object.values(ssl).every(item => item.status === 'undefined') || Object.values(ssl).some(item => item.status === 'invalid_domain'); 
+            ssl.status = error ? 'error' : 'warning';
         } else ssl.status = 'ok';
         
         return ssl;
@@ -73,8 +74,14 @@ module.exports = class CheckSslService {
     }
 
     getProtocol(data: string) {
+        // data = 'TLSv1.1'
         if (!data) return {data: null, status: 'empty'};
-        return  {data: data, status: 'ok'};
+        if (!Number(data.split('v')[1])) {
+            return {data: data, status: 'undefined'};
+        }
+        if (data.split('v')[1] === '1.0' || data.split('v')[1] === '2.0' || data.split('v')[1] === '3.0') return {data: data, status: 'older'};
+        if (data.split('v')[1] === '1.1' ) return {data: data, status: 'old'};
+        return {data: data, status: 'ok'};
     }
 
     calculateDaysRemaining(validTo: string) {
@@ -83,6 +90,7 @@ module.exports = class CheckSslService {
         const remaindTo = new Date(validTo);
         const today = new Date();
         const remainingDays = Math.floor((remaindTo.getTime() - today.getTime()) / (24 * 3600 * 1000));
+        // const remainingDays = 5;
 
         if (remainingDays < 0) {
             return {data: String(remainingDays), status: 'expire'};

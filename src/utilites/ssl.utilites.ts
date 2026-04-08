@@ -12,4 +12,4 @@ const errorStatusSSLData = (error: string): SslType => {
     }
 }
 
-exports.module = { errorStatusSSLData };
+export = { errorStatusSSLData };

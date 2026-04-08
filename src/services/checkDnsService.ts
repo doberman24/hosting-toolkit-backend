@@ -106,7 +106,7 @@ module.exports = class CheckDnsService implements ICheckDnsService {
                 }
             }));
 
-            console.log(paramListNS);
+            // console.log(paramListNS);
 
             const checkNSList = checkNSRecords(paramListNS);
             const parsingNSList = nsParsing(checkNSList);
